@@ -8,18 +8,49 @@ https://www.researchgate.net/profile/Silvia-Lopes-De-Sena-Taglialenha/publicatio
 
 Estrutura do cromossomo/Individuo -> Vetor V de tamanho n onde n é a quantidade de linhas ou colunas, consequentemente de rainhas. A posição do vetor onde a rainha se encontra será a linha e a rainha com o nome “3” estará na coluna “3”. Int[n] V (n = quantidade rainhas]
 
-
 " -	-	3	- "<br>
 " -	-	-	4 "<br>
 " -	2	-	- "<br>
 " 1	-	-	- "
 
 Método p/ gerar a população inicial -> A população de tamanho m (TP) será representada por uma matriz onde cada linha da matriz representa um cromossomo. Aleatório uniforme. 
-TP < n! // Impede de ter indivíduo iguais
 
-Operador de seleção -> Método de seleção por torneio com k=2, ou seja, é escolhido para participar de cada jogo dois indivíduos (configurações) da população corrente que são analisados e o indivíduo que detém o menor número de colisões é escolhido.
+TP < n! // Impede de ter indivíduo iguais
+V[n] = [1,2,3...n] 
+for(int i = 0; i <= TP; i++)
+  V = V.embaralhar;
+  while(população.Contains(v)) // verifica se o indivíduo já existe 
+    V = V.embaralhar;
+  População[i] = v
+
 Função de aptidão fitness -> A função objetivo é calculada verificando o número de colisões entre rainhas percorrendo as diagonais positiva e negativa do tabuleiro. É agregada a cada diagonal uma constante que a identifica, e se existir mais de uma rainha em uma diagonal é contabilizado mais uma colisão. A soma do número de colisões existentes nas diagonais positiva e negativa geram o cálculo da função objetivo. Dessa forma pode-se calcular a função objetivo de todos os elementos da população. Rever conceito 
 Operação de cruzamento / corssover -> Optou-se em trabalhar com a recombinação PMX [3] que recombina os dois indivíduos sem perder o que já havíamos conquistado (configuração sem colisões entre rainhas na mesma linha e coluna). Este tipo de recombinação trabalha com dois indivíduos previamente selecionados. É escolhido aleatoriamente o tamanho da faixa (Para ter um valor, pode ser min 2 e máximo 6) que será recombinada e onde a recombinação irá começar. Os dois indivíduos geram somente um descendente, onde é escolhido aleatoriamente (pode ser o indivíduo com menor número de colisão) em qual dos dois indivíduos a recombinação será executada para a geração de um descendente.
+
+MÉTODO RETORNA Lista<Probalilidade> ProbabilidadSobrevivencia(populacao){
+  ParaCadaCromossomo(){
+    totalColisoes = ContarColisoes()
+    Se total de colisoes != 0 
+      fitness[i] = 1/totalColisoes 
+    Se não 
+      fitiness[i] = 9999 
+    SOMA += fitness[i]
+  }
+  ParaCadaFitnessEncontrado(){
+    fitness [i] = fitness[i]/SOMA 
+  }   
+  retorna fitness 
+}
+
+Operador de seleção -> Método de seleção por torneio com k=2, ou seja, é escolhido para participar de cada jogo dois indivíduos (configurações) da população corrente que são analisados, o indivíduo com maior fitness sobrevive.
+
+MÉTODO RETORNA O MAISFORTE Torneio(fitness){
+  individuo = random(0, tamanhoPopulacao)
+  competidor = random(0, tamanhoPopulacao)
+  Se fitness[individuo] > fitness[competidor]{
+    retorna individuo
+  } 
+  retorna competidor 
+}
 
 Operação de mutação -> A mutação se dá de uma maneira muito simples. Serão escolhidas aleatoriamente duas rainhas em cada indivíduo da população corrente para se fazer à troca de posição destas rainhas no tabuleiro.
 
