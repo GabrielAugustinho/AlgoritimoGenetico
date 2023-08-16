@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "95IlZezshSiH18vmbMY5kyeo7EDiEnjs9dsrn+nuxilVK5TWDZtXZ4reiEunUGWh9ywubJyNEmjGTDb6WX0mPQ==",
+  "dgSpecHash": "i6c2zaK/MSMRxuLOQkwMLzFEf+L9/a3b0cX3bArWrJ/FwN6idMPaS7CiGKaxmt7g1ulH+hm376kLeYWWePG7gA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
+  "projectFilePath": "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\6.0.1\\microsoft.extensions.dependencyinjection.6.0.1.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
