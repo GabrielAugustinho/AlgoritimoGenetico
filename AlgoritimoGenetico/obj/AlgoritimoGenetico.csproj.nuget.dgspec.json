@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj": {}
+    "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj": {
+    "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
         "projectName": "AlgoritimoGenetico",
-        "projectPath": "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\source\\repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config",
