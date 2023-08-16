@@ -183,19 +183,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {}
+    "C:\\Users\\Usuario\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Repos\\ConsoleApp\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
+      "projectUniqueName": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
       "projectName": "AlgoritimoGenetico",
-      "projectPath": "C:\\Repos\\ConsoleApp\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Repos\\ConsoleApp\\AlgoritimoGenetico\\AlgoritimoGenetico\\obj\\",
+      "projectPath": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\AlgoritimoGenetico.csproj",
+      "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Usuario\\Source\\Repos\\GabrielAugustinho\\AlgoritimoGenetico\\AlgoritimoGenetico\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
