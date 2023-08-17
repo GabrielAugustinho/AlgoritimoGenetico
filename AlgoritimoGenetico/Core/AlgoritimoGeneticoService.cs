@@ -1,41 +1,38 @@
 ﻿using AlgoritimoGenetico.Extensions;
-using Newtonsoft.Json;
 
 namespace AlgoritimoGenetico.Core
 {
     public class AlgoritimoGeneticoService : IAlgoritimoGeneticoService
     {
         private readonly Random Aleatorio = new();
-        private readonly int QtdRainhas = 8;
-        private int TamanhoPopulacao;
+        private const int QtdRainhas = 8;
+        private const int TamanhoPopulacao = 10;
+
         private HashSet<int[]> Populacao = new();
+        private double[] Fitness;
+
+        public AlgoritimoGeneticoService()
+        {
+            Fitness = new double[QtdRainhas];
+        }
 
         public void Run()
         {
-            InicializarPopulacao();
-            MostrarProbabilidadesDeSobrevivencia();
+            GerarPopulacaoInicial();
+            MostrarPopulacaoInicial();
+
+            CalcularFitness();
+            MostrarFitness();
+
+            var pai1 = SelecaoPorTorneio();
+            var pai2 = SelecaoPorTorneio();
+            MostrarPaisEscolhidosPorTorneio(pai1, pai2);
+
             // Implementar o restante da lógica do algoritmo genético aqui
             Console.ReadLine();
         }
 
-        private void InicializarPopulacao()
-        {
-            CalcularTamanhoPopulacao();
-            GerarPopulacaoInicial();
-            MostrarPopulacaoInicial();
-        }
-
-        private void CalcularTamanhoPopulacao()
-        {
-            TamanhoPopulacao = 10;
-        }
-
         private void GerarPopulacaoInicial()
-        {
-            Populacao = GerarConjuntoPopulacionalInicial();
-        }
-
-        private HashSet<int[]> GerarConjuntoPopulacionalInicial()
         {
             var conjuntoPopulacionalInicial = new HashSet<int[]>(new ArrayComparer());
             for (int i = 0; i < TamanhoPopulacao; i++)
@@ -46,7 +43,7 @@ namespace AlgoritimoGenetico.Core
                     cromossomo = GerarCromossomoAleatorio();
                 }
             }
-            return conjuntoPopulacionalInicial;
+            Populacao = conjuntoPopulacionalInicial;
         }
 
         private int[] GerarCromossomoAleatorio()
@@ -66,16 +63,7 @@ namespace AlgoritimoGenetico.Core
             }
         }
 
-        private void MostrarPopulacaoInicial()
-        {
-            Console.WriteLine("População inicial:\n");
-            foreach (var individuo in Populacao)
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(individuo));
-            }
-        }
-
-        private double[] CalcularProbabilidadesDeSobrevivencia()
+        private void CalcularFitness()
         {
             double totalAptidao = 0;
             var aptidao = new double[Populacao.Count];
@@ -84,19 +72,16 @@ namespace AlgoritimoGenetico.Core
             foreach (var individuo in Populacao)
             {
                 var colisoes = CalcularColisoes(individuo);
-                var aptidaoIndividuo = colisoes != 0 ? 1.0 / colisoes : 9999.0;
+                var aptidaoIndividuo = colisoes != 0 ? 1.0 / colisoes : 99999.0;
 
                 aptidao[index] = aptidaoIndividuo;
                 totalAptidao += aptidaoIndividuo;
                 index++;
             }
 
-            for (int i = 0; i < aptidao.Length; i++)
-            {
-                aptidao[i] /= totalAptidao;
-            }
+            aptidao = aptidao.Select(a => a / totalAptidao).ToArray();
 
-            return aptidao;
+            Fitness = aptidao;
         }
 
         private int CalcularColisoes(int[] individuo)
@@ -121,15 +106,47 @@ namespace AlgoritimoGenetico.Core
             return colisoes;
         }
 
-        private void MostrarProbabilidadesDeSobrevivencia()
+        private int SelecaoPorTorneio()
         {
-            var aptidoesPopulacionais = CalcularProbabilidadesDeSobrevivencia();
+            int individuo = Aleatorio.Next(0, TamanhoPopulacao);
+            int competidor = Aleatorio.Next(0, TamanhoPopulacao);
 
-            Console.WriteLine("\nProbabilidades de sobrevivência:\n");
-            foreach (var aptidao in aptidoesPopulacionais)
+            if (Fitness[individuo] > Fitness[competidor])
+                return individuo;
+
+            return competidor;
+        }
+
+        private void MostrarPopulacaoInicial()
+        {
+            Console.WriteLine("População Inicial:\n");
+            int individuoIndex = 1;
+            foreach (var individuo in Populacao)
             {
-                Console.WriteLine(JsonConvert.SerializeObject(aptidao));
+                Console.WriteLine($"Indivíduo {individuoIndex++}: {FormatarCromossomo(individuo)}");
             }
         }
+
+        private void MostrarFitness()
+        {
+            Console.WriteLine("\nAptidão dos Indivíduos:\n");
+            for (int i = 0; i < Populacao.Count; i++)
+            {
+                Console.WriteLine($"Indivíduo {i + 1}: Aptidão = {Fitness[i]}");
+            }
+        }
+
+        private void MostrarPaisEscolhidosPorTorneio(int pai1, int pai2)
+        {
+            Console.WriteLine("\nPais Escolhidos pelo Método do Torneio:\n");
+            Console.WriteLine($"Pai 1: {FormatarCromossomo(Populacao.ElementAt(pai1))} -> Aptidão: {Fitness[pai1]}");
+            Console.WriteLine($"Pai 2: {FormatarCromossomo(Populacao.ElementAt(pai2))} -> Aptidão: {Fitness[pai2]}");
+        }
+
+        private string FormatarCromossomo(int[] cromossomo)
+        {
+            return "[" + string.Join(", ", cromossomo) + "]";
+        }
+
     }
 }
