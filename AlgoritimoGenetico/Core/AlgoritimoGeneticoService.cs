@@ -11,48 +11,48 @@
         private const int MaxGeracoesSemMelhora = 10;
 
         private List<int[]> Populacao;
-        private List<double> FitnessIndices;
+        private double[] Fitness;
+
         private readonly Random Aleatorio = new();
 
         public AlgoritimoGeneticoService()
         {
-            Populacao = new List<int[]>();
-            FitnessIndices = new List<double>();
+            Populacao = new List<int[]>(TamanhoPopulacao);
+            Fitness = new double[TamanhoPopulacao];
         }
 
         public void Run()
         {
+            GerarPopulacaoInicial();
+
             int geracaoAtual = 0;
             int geracoesSemMelhora = 0;
             int melhorGeracao = 0;
-            int[] melhorIndividuo = null;
-
-            GerarPopulacaoInicial();
-            Console.WriteLine("População Inicial:\n");
-            MostrarPopulacao();
+            int[] melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
 
             while (geracaoAtual < NumeroMaximoDeGeracoes)
             {
                 var pai1 = SelecaoPorTorneio();
                 var pai2 = SelecaoPorTorneio();
+
+                Console.WriteLine($"Pais escolhidos para o crusamento: {FormatarCromossomo(pai1)} + {FormatarCromossomo(pai2)}");
+
                 var descendente = CruzamentoPMX(pai1, pai2);
                 descendente = Mutacao(descendente);
 
-                if (SubstituirPiorIndividuo(descendente))
-                {
-                    // Atualize o FitnessIndices apenas quando necessário
-                    CalcularFitness();
-                }
+                Console.WriteLine($"Filho após cruzamento e mutação: {FormatarCromossomo(descendente)}");
+
+                SubstituirPiorIndividuo(descendente);
 
                 geracaoAtual++;
                 Console.WriteLine($"\n{geracaoAtual}° Geração:\n");
                 MostrarPopulacao();
 
                 // Verifique se o melhor indivíduo mudou
-                if (FitnessIndices.Max() > melhorIndividuo?.Max())
+                if (melhorIndividuo != Populacao[Array.IndexOf(Fitness, Fitness.Max())])
                 {
                     geracoesSemMelhora = 0; // Resetar contagem
-                    melhorIndividuo = Populacao[Array.IndexOf(FitnessIndices.ToArray(), FitnessIndices.Max())];
+                    melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
                     melhorGeracao = geracaoAtual;
                 }
                 else
@@ -60,15 +60,10 @@
                     geracoesSemMelhora++;
                 }
 
-                if (melhorIndividuo != null)
-                {
-                    Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: {FormatarCromossomo(melhorIndividuo)}");
-                    Console.WriteLine($"Aptidão do melhor indivíduo: {FitnessIndices.Max()}");
-                }
-                else
-                {
-                    Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: Nenhum indivíduo encontrado.");
-                }
+                Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: {FormatarCromossomo(melhorIndividuo)}");
+                Console.WriteLine($"Aptidão do melhor indivíduo: {Fitness.Max()}");
+                Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
+                Console.WriteLine();
 
                 if (geracoesSemMelhora >= MaxGeracoesSemMelhora)
                 {
@@ -82,15 +77,21 @@
 
         private void GerarPopulacaoInicial()
         {
-            Populacao = new List<int[]>(TamanhoPopulacao);
-            FitnessIndices = new List<double>(TamanhoPopulacao);
-
             for (int i = 0; i < TamanhoPopulacao; i++)
             {
                 int[] cromossomo = GerarCromossomoAleatorio();
                 Populacao.Add(cromossomo);
-                FitnessIndices.Add(CalcularAptidao(cromossomo));
+                Fitness[i] = CalcularAptidao(cromossomo);
             }
+
+            var melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
+
+            Console.WriteLine("População Inicial:\n");
+            MostrarPopulacao();
+            Console.WriteLine($"Melhor indivíduo na população inicial: {FormatarCromossomo(melhorIndividuo)}");
+            Console.WriteLine($"Aptidão do melhor indivíduo: {Fitness.Max()}");
+            Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
+            Console.WriteLine();
         }
 
         private int[] GerarCromossomoAleatorio()
@@ -109,32 +110,6 @@
                 (array[j], array[i]) = (array[i], array[j]);
             }
         }
-
-        private void CalcularFitness()
-        {
-            double totalAptidao = 0;
-            var aptidao = new double[TamanhoPopulacao];
-
-            for (int i = 0; i < TamanhoPopulacao; i++)
-            {
-                var individuo = Populacao[i];
-
-                var colisoes = CalcularColisoes(individuo);
-                var aptidaoIndividuo = colisoes != 0 ? 1.0 / colisoes : 99999.0;
-
-                aptidao[i] = aptidaoIndividuo;
-                totalAptidao += aptidaoIndividuo;
-
-                // Imprimir a aptidão do indivíduo
-                Console.WriteLine($"Aptidão do Indivíduo {i + 1}: {aptidaoIndividuo}");
-            }
-
-            aptidao = aptidao.Select(a => a / totalAptidao).ToArray();
-
-            FitnessIndices = aptidao.ToList();
-        }
-
-
 
         private int CalcularColisoes(int[] individuo)
         {
@@ -163,8 +138,8 @@
             int indiceIndividuo1 = Aleatorio.Next(0, TamanhoPopulacao);
             int indiceIndividuo2 = Aleatorio.Next(0, TamanhoPopulacao);
 
-            double aptidao1 = FitnessIndices[indiceIndividuo1];
-            double aptidao2 = FitnessIndices[indiceIndividuo2];
+            double aptidao1 = Fitness[indiceIndividuo1];
+            double aptidao2 = Fitness[indiceIndividuo2];
 
             // Retorne o indivíduo com a maior aptidão
             return aptidao1 > aptidao2 ? Populacao[indiceIndividuo1] : Populacao[indiceIndividuo2];
@@ -205,8 +180,15 @@
             return descendente;
         }
 
-
         private int[] Mutacao(int[] individuo)
+        {
+            individuo = MutacaoExistensial(individuo);
+            individuo = MutacaoIndividual(individuo);
+
+            return individuo;
+        }
+
+        private int[] MutacaoExistensial(int[] individuo)
         {
             // Crie uma lista dos números que já estão no cromossomo
             var numerosNoCromossomo = new List<int>(individuo);
@@ -237,33 +219,82 @@
             return individuo;
         }
 
-
-        private bool SubstituirPiorIndividuo(int[] descendente)
+        private int[] MutacaoIndividual(int[] individuo)
         {
-            double piorAptidao = double.MaxValue; // Inicialize com um valor alto para garantir que qualquer aptidão será menor.
+            // Verifica se a mutação individual deve ocorrer com base na taxa de mutação
+            if (Aleatorio.NextDouble() <= TaxaDeMutacao)
+            {
+                int rainha1 = Aleatorio.Next(QtdRainhas);
+                int rainha2 = Aleatorio.Next(QtdRainhas);
+
+                // Certifique-se de que as duas rainhas selecionadas sejam diferentes
+                while (rainha1 == rainha2)
+                {
+                    rainha2 = Aleatorio.Next(QtdRainhas);
+                }
+
+                // Realize a troca das duas rainhas
+                int temp = individuo[rainha1];
+                individuo[rainha1] = individuo[rainha2];
+                individuo[rainha2] = temp;
+            }
+
+            return individuo;
+        }
+
+
+        private void SubstituirPiorIndividuo(int[] descendente)
+        {
+            double piorAptidao = 99999.0;
             int indicePiorIndividuo = -1;
 
-            // Encontrar o índice do pior indivíduo na lista FitnessIndices
-            for (int i = 0; i < FitnessIndices.Count; i++)
+            // Encontrar o índice do pior indivíduo na lista Fitness
+            for (int i = 0; i < Fitness.Length; i++)
             {
-                if (FitnessIndices[i] < piorAptidao)
+                if (Fitness[i] < piorAptidao)
                 {
-                    piorAptidao = FitnessIndices[i];
+                    piorAptidao = Fitness[i];
                     indicePiorIndividuo = i;
                 }
             }
 
+            // Calcular a aptidão do descendente
+            var aptidaoDecendente = CalcularAptidao(descendente);
+            Console.WriteLine($"\nPior indivíduo da família e descendente:\n" +
+                              $"{FormatarCromossomo(Populacao[indicePiorIndividuo])} -> {FormatarCromossomo(descendente)}\n" +
+                              $"Fitness: {piorAptidao} -> {aptidaoDecendente}");
+
             // Verificar se o descendente é melhor que o pior indivíduo e não é igual a nenhum indivíduo existente
-            if (indicePiorIndividuo != -1 && CalcularAptidao(descendente) < piorAptidao)
+            bool trocaRealizada = false;
+            if (indicePiorIndividuo != -1 && aptidaoDecendente >= piorAptidao)
             {
-                Populacao[indicePiorIndividuo] = descendente;
-                FitnessIndices[indicePiorIndividuo] = CalcularAptidao(descendente);
-                return true;
+                // Verificar se o descendente não é igual a nenhum indivíduo existente
+                for (int i = 0; i < Populacao.Count; i++)
+                {
+                    if (Enumerable.SequenceEqual(Populacao[i], descendente))
+                    {
+                        Console.WriteLine("TROCA DESCONSIDERADA - Descendente igual a um existente na família.");
+                        trocaRealizada = false;
+                        break;
+                    }
+                    else
+                    {
+                        trocaRealizada = true;
+                    }
+                }
+
+                if (trocaRealizada)
+                {
+                    Populacao[indicePiorIndividuo] = descendente;
+                    Fitness[indicePiorIndividuo] = aptidaoDecendente;
+                    Console.WriteLine("TROCA REALIZADA!!!");
+                }
             }
-
-            return false;
+            else
+            {
+                Console.WriteLine("TROCA DESCONSIDERADA - Descendente não é melhor que o pior indivíduo.");
+            }
         }
-
 
         private double CalcularAptidao(int[] individuo)
         {
@@ -276,8 +307,9 @@
             int individuoIndex = 1;
             foreach (var individuo in Populacao)
             {
-                Console.WriteLine($"Indivíduo {individuoIndex++}: {FormatarCromossomo(individuo)}");
+                Console.WriteLine($"Indivíduo {individuoIndex++}: {FormatarCromossomo(individuo)} -> Fitness: {Fitness[Populacao.IndexOf(individuo)]}");
             }
+            Console.WriteLine();
         }
 
         private string FormatarCromossomo(int[] cromossomo)
