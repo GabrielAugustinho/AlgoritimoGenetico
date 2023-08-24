@@ -1,14 +1,16 @@
-﻿namespace AlgoritimoGenetico.Core
+﻿using System.Diagnostics;
+
+namespace AlgoritimoGenetico.Core
 {
     public class AlgoritimoGeneticoService : IAlgoritimoGeneticoService
     {
         // Parametros Geneticos
         private const int QtdRainhas = 8;
-        private const int TamanhoPopulacao = 10;
-        private const int NumeroMaximoDeGeracoes = 10;
-        private const double TaxaDeCruzamento = 0.8;
+        private const int TamanhoPopulacao = 20;
+        private const int NumeroMaximoDeGeracoes = 100;
+        private const double TaxaDeCruzamento = 0.5;
         private const double TaxaDeMutacao = 0.1;
-        private const int MaxGeracoesSemMelhora = 10;
+        private const int MaxGeracoesSemMelhora = 20;
 
         private List<int[]> Populacao;
         private double[] Fitness;
@@ -23,6 +25,11 @@
 
         public void Run()
         {
+            Console.WriteLine("Iniciando Algoritmo Genético...\n");
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             GerarPopulacaoInicial();
 
             int geracaoAtual = 0;
@@ -32,20 +39,23 @@
 
             while (geracaoAtual < NumeroMaximoDeGeracoes)
             {
+                DiversificarPopulacao();
+
                 var pai1 = SelecaoPorTorneio();
                 var pai2 = SelecaoPorTorneio();
 
-                Console.WriteLine($"Pais escolhidos para o crusamento: {FormatarCromossomo(pai1)} + {FormatarCromossomo(pai2)}");
+                Console.WriteLine($"Geração {geracaoAtual} - Pais para Cruzamento: {FormatarCromossomo(pai1)} + {FormatarCromossomo(pai2)}");
 
                 var descendente = CruzamentoPMX(pai1, pai2);
                 descendente = Mutacao(descendente);
 
-                Console.WriteLine($"Filho após cruzamento e mutação: {FormatarCromossomo(descendente)}");
+                Console.WriteLine($"Filho após Cruzamento e Mutação: {FormatarCromossomo(descendente)}");
 
                 SubstituirPiorIndividuo(descendente);
 
                 geracaoAtual++;
-                Console.WriteLine($"\n{geracaoAtual}° Geração:\n");
+
+                Console.WriteLine($"\n{geracaoAtual}ª Geração:");
                 MostrarPopulacao();
 
                 // Verifique se o melhor indivíduo mudou
@@ -61,22 +71,35 @@
                 }
 
                 Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: {FormatarCromossomo(melhorIndividuo)}");
-                Console.WriteLine($"Aptidão do melhor indivíduo: {Fitness.Max()}");
-                Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
+                Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
+                Console.WriteLine($"Pior Aptidão: {Fitness.Min()}");
                 Console.WriteLine();
 
-                if (geracoesSemMelhora >= MaxGeracoesSemMelhora)
+                if (geracoesSemMelhora >= MaxGeracoesSemMelhora && Fitness.Max() > 1)
                 {
-                    Console.WriteLine($"Convergência alcançada na {melhorGeracao}° geração.");
+                    Console.WriteLine($"Convergência alcançada na {melhorGeracao}ª geração.");
                     break;
                 }
             }
+
+            stopwatch.Stop();
+            TimeSpan tempoDecorrido = stopwatch.Elapsed;
+
+            Console.WriteLine("\nAlgoritmo Genético Concluído.");
+            Console.WriteLine($"Melhor resultado encontrado na {melhorGeracao}ª geração.");
+            Console.WriteLine($"Melhor Indivíduo: {FormatarCromossomo(melhorIndividuo)}");
+            Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
+            Console.WriteLine($"Tempo total de execução: {tempoDecorrido}");
+
+            // Imprimir o tabuleiro com as posições das rainhas do melhor indivíduo
+            ImprimirTabuleiro(melhorIndividuo);
 
             Console.ReadLine();
         }
 
         private void GerarPopulacaoInicial()
         {
+            // Inicializando a população com cromossomos aleatórios
             for (int i = 0; i < TamanhoPopulacao; i++)
             {
                 int[] cromossomo = GerarCromossomoAleatorio();
@@ -84,6 +107,7 @@
                 Fitness[i] = CalcularAptidao(cromossomo);
             }
 
+            // Encontrando o melhor indivíduo na população inicial
             var melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
 
             Console.WriteLine("População Inicial:\n");
@@ -93,6 +117,7 @@
             Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
             Console.WriteLine();
         }
+
 
         private int[] GerarCromossomoAleatorio()
         {
@@ -296,6 +321,26 @@
             }
         }
 
+        private void DiversificarPopulacao()
+        {
+            int numeroDeIndividuosAReiniciar = (int)(0.2 * TamanhoPopulacao); // Reinicialize 20% da população, por exemplo.
+
+            for (int i = 0; i < numeroDeIndividuosAReiniciar; i++)
+            {
+                int indiceAleatorio = Aleatorio.Next(TamanhoPopulacao);
+                int[] novoIndividuo = GerarCromossomoAleatorio();
+                double novaAptidao = CalcularAptidao(novoIndividuo);
+
+                // Verifique se a aptidão do novo indivíduo é melhor ou igual à aptidão do indivíduo existente
+                if (novaAptidao >= Fitness[indiceAleatorio])
+                {
+                    Populacao[indiceAleatorio] = novoIndividuo; // Substitua o indivíduo existente pelo novo
+                    Fitness[indiceAleatorio] = novaAptidao; // Atualize a aptidão
+                }
+            }
+        }
+
+
         private double CalcularAptidao(int[] individuo)
         {
             int colisoes = CalcularColisoes(individuo);
@@ -316,5 +361,31 @@
         {
             return "[" + string.Join(", ", cromossomo) + "]";
         }
+
+        private void ImprimirTabuleiro(int[] individuo)
+        {
+            int tamanhoTabuleiro = individuo.Length;
+
+            Console.WriteLine("Tabuleiro com as posições das rainhas:\n");
+
+            for (int linha = 0; linha < tamanhoTabuleiro; linha++)
+            {
+                for (int coluna = 0; coluna < tamanhoTabuleiro; coluna++)
+                {
+                    if (individuo[linha] == coluna)
+                    {
+                        Console.Write($"{coluna} "); // Imprime o número da coluna
+                    }
+                    else
+                    {
+                        Console.Write(". "); // "." representa uma posição vazia
+                    }
+                }
+                Console.WriteLine(); // Avança para a próxima linha do tabuleiro
+            }
+
+            Console.WriteLine();
+        }
+
     }
 }
