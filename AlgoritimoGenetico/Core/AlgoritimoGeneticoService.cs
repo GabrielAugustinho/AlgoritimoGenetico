@@ -226,7 +226,7 @@ namespace AlgoritimoGenetico.Core
                     int numeroRepetido = individuo[rainha1];
 
                     // Encontre o menor número que não esteja no cromossomo
-                    int menorNumero = 1;
+                    int menorNumero = 0;
                     while (numerosNoCromossomo.Contains(menorNumero))
                     {
                         menorNumero++;
