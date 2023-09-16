@@ -5,29 +5,33 @@ namespace AlgoritimoGenetico.Core
     public class AlgoritimoGeneticoService : IAlgoritimoGeneticoService
     {
         // Parametros Geneticos
-        private const int QtdRainhas = 8;
-        private const int TamanhoPopulacao = 20;
-        private const int NumeroMaximoDeGeracoes = 100;
-        private const double TaxaDeCruzamento = 0.5;
-        private const double TaxaDeMutacao = 0.1;
-        private const int MaxGeracoesSemMelhora = 20;
+        public const int QtdRainhas = 8;
+        public int TamanhoPopulacao = 20;
+        public int NumeroMaximoDeGeracoes = 100;
+        public double TaxaDeCruzamento = 0.5;
+        public double TaxaDeMutacao = 0.1;
+        public double IntervaloGeracional = 0.4;
+        public int MaxGeracoesSemMelhora = 20;
 
-        private List<int[]> Populacao;
-        private double[] Fitness;
+        private List<int[]> Populacao = new();
+        private List<double> Fitness;
 
         private readonly Random Aleatorio = new();
 
-        public AlgoritimoGeneticoService()
+        public void Run(int tamanhoPopulacao, int numeroMaximoDeGeracoes, double taxaDeCruzamento, double taxaDeMutacao, double intervaloGeracional)
         {
             Populacao = new List<int[]>(TamanhoPopulacao);
-            Fitness = new double[TamanhoPopulacao];
-        }
+            Fitness = new List<double>(TamanhoPopulacao);
 
-        public void Run()
-        {
-            Console.WriteLine("Iniciando Algoritmo Genético...\n");
+            TamanhoPopulacao = tamanhoPopulacao;
+            NumeroMaximoDeGeracoes = numeroMaximoDeGeracoes;
+            TaxaDeCruzamento = taxaDeCruzamento;
+            TaxaDeMutacao = taxaDeMutacao;
+            IntervaloGeracional = intervaloGeracional;
 
-            Stopwatch stopwatch = new Stopwatch();
+            // Console.WriteLine("Iniciando Algoritmo Genético...\n");
+
+            Stopwatch stopwatch = new();
             stopwatch.Start();
 
             GerarPopulacaoInicial();
@@ -35,34 +39,35 @@ namespace AlgoritimoGenetico.Core
             int geracaoAtual = 0;
             int geracoesSemMelhora = 0;
             int melhorGeracao = 0;
-            int[] melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
+            int[] melhorIndividuo = Populacao[Fitness.IndexOf(Fitness.Max())];
 
             while (geracaoAtual < NumeroMaximoDeGeracoes)
             {
-                DiversificarPopulacao();
+                if (Aleatorio.Next(0, 100) < TamanhoPopulacao * IntervaloGeracional)
+                    DiversificarPopulacao();
 
                 var pai1 = SelecaoPorTorneio();
                 var pai2 = SelecaoPorTorneio();
 
-                Console.WriteLine($"Geração {geracaoAtual} - Pais para Cruzamento: {FormatarCromossomo(pai1)} + {FormatarCromossomo(pai2)}");
+                // Console.WriteLine($"Geração {geracaoAtual} - Pais para Cruzamento: {FormatarCromossomo(pai1)} + {FormatarCromossomo(pai2)}");
 
                 var descendente = CruzamentoPMX(pai1, pai2);
                 descendente = Mutacao(descendente);
 
-                Console.WriteLine($"Filho após Cruzamento e Mutação: {FormatarCromossomo(descendente)}");
+                // Console.WriteLine($"Filho após Cruzamento e Mutação: {FormatarCromossomo(descendente)}");
 
                 SubstituirPiorIndividuo(descendente);
 
                 geracaoAtual++;
 
-                Console.WriteLine($"\n{geracaoAtual}ª Geração:");
+                // Console.WriteLine($"\n{geracaoAtual}ª Geração:");
                 MostrarPopulacao();
 
                 // Verifique se o melhor indivíduo mudou
-                if (melhorIndividuo != Populacao[Array.IndexOf(Fitness, Fitness.Max())])
+                if (melhorIndividuo != Populacao[Fitness.IndexOf(Fitness.Max())])
                 {
                     geracoesSemMelhora = 0; // Resetar contagem
-                    melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
+                    melhorIndividuo = Populacao[Fitness.IndexOf(Fitness.Max())];
                     melhorGeracao = geracaoAtual;
                 }
                 else
@@ -70,14 +75,14 @@ namespace AlgoritimoGenetico.Core
                     geracoesSemMelhora++;
                 }
 
-                Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: {FormatarCromossomo(melhorIndividuo)}");
-                Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
-                Console.WriteLine($"Pior Aptidão: {Fitness.Min()}");
-                Console.WriteLine();
+                // Console.WriteLine($"Melhor indivíduo na geração {geracaoAtual}: {FormatarCromossomo(melhorIndividuo)}");
+                // Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
+                // Console.WriteLine($"Pior Aptidão: {Fitness.Min()}");
+                // Console.WriteLine();
 
                 if (geracoesSemMelhora >= MaxGeracoesSemMelhora && Fitness.Max() > 1)
                 {
-                    Console.WriteLine($"Convergência alcançada na {melhorGeracao}ª geração.");
+                    // Console.WriteLine($"Convergência alcançada na {melhorGeracao}ª geração.");
                     break;
                 }
             }
@@ -85,16 +90,16 @@ namespace AlgoritimoGenetico.Core
             stopwatch.Stop();
             TimeSpan tempoDecorrido = stopwatch.Elapsed;
 
-            Console.WriteLine("\nAlgoritmo Genético Concluído.");
-            Console.WriteLine($"Melhor resultado encontrado na {melhorGeracao}ª geração.");
-            Console.WriteLine($"Melhor Indivíduo: {FormatarCromossomo(melhorIndividuo)}");
-            Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
-            Console.WriteLine($"Tempo total de execução: {tempoDecorrido}");
+            // Console.WriteLine("\nAlgoritmo Genético Concluído.");
+            // Console.WriteLine($"Melhor resultado encontrado na {melhorGeracao}ª geração.");
+            // Console.WriteLine($"Melhor Indivíduo: {FormatarCromossomo(melhorIndividuo)}");
+            // Console.WriteLine($"Melhor Aptidão: {Fitness.Max()}");
+            // Console.WriteLine($"Tempo total de execução: {tempoDecorrido}");
 
             // Imprimir o tabuleiro com as posições das rainhas do melhor indivíduo
-            ImprimirTabuleiro(melhorIndividuo);
+            // ImprimirTabuleiro(melhorIndividuo);
 
-            Console.ReadLine();
+            Console.WriteLine($"{tamanhoPopulacao} {numeroMaximoDeGeracoes} {taxaDeCruzamento} {taxaDeMutacao} {intervaloGeracional} {FormatarCromossomo(melhorIndividuo)} -> {Fitness.Max()}");
         }
 
         private void GerarPopulacaoInicial()
@@ -104,18 +109,18 @@ namespace AlgoritimoGenetico.Core
             {
                 int[] cromossomo = GerarCromossomoAleatorio();
                 Populacao.Add(cromossomo);
-                Fitness[i] = CalcularAptidao(cromossomo);
+                Fitness.Add(CalcularAptidao(cromossomo));
             }
 
             // Encontrando o melhor indivíduo na população inicial
-            var melhorIndividuo = Populacao[Array.IndexOf(Fitness, Fitness.Max())];
+            var melhorIndividuo = Populacao[Fitness.IndexOf(Fitness.Max())];
 
-            Console.WriteLine("População Inicial:\n");
+            // Console.WriteLine("População Inicial:\n");
             MostrarPopulacao();
-            Console.WriteLine($"Melhor indivíduo na população inicial: {FormatarCromossomo(melhorIndividuo)}");
-            Console.WriteLine($"Aptidão do melhor indivíduo: {Fitness.Max()}");
-            Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
-            Console.WriteLine();
+            // Console.WriteLine($"Melhor indivíduo na população inicial: {FormatarCromossomo(melhorIndividuo)}");
+            // Console.WriteLine($"Aptidão do melhor indivíduo: {Fitness.Max()}");
+            // Console.WriteLine($"Aptidão do pior indivíduo: {Fitness.Min()}");
+            // Console.WriteLine();
         }
 
 
@@ -274,7 +279,7 @@ namespace AlgoritimoGenetico.Core
             int indicePiorIndividuo = -1;
 
             // Encontrar o índice do pior indivíduo na lista Fitness
-            for (int i = 0; i < Fitness.Length; i++)
+            for (int i = 0; i < Fitness.Count; i++)
             {
                 if (Fitness[i] < piorAptidao)
                 {
@@ -285,9 +290,9 @@ namespace AlgoritimoGenetico.Core
 
             // Calcular a aptidão do descendente
             var aptidaoDecendente = CalcularAptidao(descendente);
-            Console.WriteLine($"\nPior indivíduo da família e descendente:\n" +
-                              $"{FormatarCromossomo(Populacao[indicePiorIndividuo])} -> {FormatarCromossomo(descendente)}\n" +
-                              $"Fitness: {piorAptidao} -> {aptidaoDecendente}");
+            // Console.WriteLine($"\nPior indivíduo da família e descendente:\n" +
+            //                  $"{FormatarCromossomo(Populacao[indicePiorIndividuo])} -> {FormatarCromossomo(descendente)}\n" +
+            //                 $"Fitness: {piorAptidao} -> {aptidaoDecendente}");
 
             // Verificar se o descendente é melhor que o pior indivíduo e não é igual a nenhum indivíduo existente
             bool trocaRealizada = false;
@@ -298,7 +303,7 @@ namespace AlgoritimoGenetico.Core
                 {
                     if (Enumerable.SequenceEqual(Populacao[i], descendente))
                     {
-                        Console.WriteLine("TROCA DESCONSIDERADA - Descendente igual a um existente na família.");
+                        // Console.WriteLine("TROCA DESCONSIDERADA - Descendente igual a um existente na família.");
                         trocaRealizada = false;
                         break;
                     }
@@ -312,12 +317,12 @@ namespace AlgoritimoGenetico.Core
                 {
                     Populacao[indicePiorIndividuo] = descendente;
                     Fitness[indicePiorIndividuo] = aptidaoDecendente;
-                    Console.WriteLine("TROCA REALIZADA!!!");
+                    // Console.WriteLine("TROCA REALIZADA!!!");
                 }
             }
             else
             {
-                Console.WriteLine("TROCA DESCONSIDERADA - Descendente não é melhor que o pior indivíduo.");
+                // Console.WriteLine("TROCA DESCONSIDERADA - Descendente não é melhor que o pior indivíduo.");
             }
         }
 
@@ -352,9 +357,9 @@ namespace AlgoritimoGenetico.Core
             int individuoIndex = 1;
             foreach (var individuo in Populacao)
             {
-                Console.WriteLine($"Indivíduo {individuoIndex++}: {FormatarCromossomo(individuo)} -> Fitness: {Fitness[Populacao.IndexOf(individuo)]}");
+                // Console.WriteLine($"Indivíduo {individuoIndex++}: {FormatarCromossomo(individuo)} -> Fitness: {Fitness[Populacao.IndexOf(individuo)]}");
             }
-            Console.WriteLine();
+            // Console.WriteLine();
         }
 
         private string FormatarCromossomo(int[] cromossomo)
@@ -366,7 +371,7 @@ namespace AlgoritimoGenetico.Core
         {
             int tamanhoTabuleiro = individuo.Length;
 
-            Console.WriteLine("Tabuleiro com as posições das rainhas:\n");
+            // Console.WriteLine("Tabuleiro com as posições das rainhas:\n");
 
             for (int linha = 0; linha < tamanhoTabuleiro; linha++)
             {
@@ -381,10 +386,10 @@ namespace AlgoritimoGenetico.Core
                         Console.Write(". "); // "." representa uma posição vazia
                     }
                 }
-                Console.WriteLine(); // Avança para a próxima linha do tabuleiro
+                // Console.WriteLine(); // Avança para a próxima linha do tabuleiro
             }
 
-            Console.WriteLine();
+            // Console.WriteLine();
         }
 
     }
